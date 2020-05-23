@@ -46,9 +46,10 @@ const Styles = (theme: Theme) =>
     });
 
 type GameBoardProps = {
-    playerColor: 'RED' | 'YELLOW' // restrict to RED or YELLOW
+    playerColor: string // restrict to RED or YELLOW
     enabled: boolean;
     extrnalMove: string;
+   // reset: boolean;
     onChipDrop: ((locationCode: string) => void);
     classes: {
         boardGrid: string;
@@ -77,7 +78,7 @@ class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
             selctorsEnabled: [],
         };
         this.initGameBoard();
-        this.handleColumnSelection = this.handleColumnSelection.bind(this);
+        this.handleColumnSelection = this.handleColumnSelection.bind(this); // TODO figure out what needs ot bind and what not
         this.dropChip = this.dropChip.bind(this);
         this.processExternalMove = this.processExternalMove.bind(this);
 
@@ -87,6 +88,9 @@ class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
         if (prevProps.extrnalMove !== this.props.extrnalMove && '' !== this.props.extrnalMove) {
             this.processExternalMove(this.props.extrnalMove);
         }
+        // if (!prevProps.reset && this.props.reset) {
+        //     this.resetGameBoard();
+        // }
     }
 
     initGameBoard() {
@@ -103,7 +107,21 @@ class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
             }
         }
         this.setState({ tiles: tiles, columnSlots: columnSlots, selctorsEnabled: selectorsEnabled });
+    }
 
+    resetGameBoard() {
+        var tiles = this.state.tiles;
+        var columnSlots = this.state.columnSlots;
+        var selectorsEnabled = this.state.selctorsEnabled;
+        var row, column;
+        for (column = 0; column < boardColumns; column++) {
+            selectorsEnabled[column] = true;
+            columnSlots[column] = 0;
+            for (row = 0; row < boardRows; row++) {
+                tiles[column][row] = 'white';
+            }
+        }
+        this.setState({ tiles: tiles, columnSlots: columnSlots, selctorsEnabled: selectorsEnabled });
     }
 
     dropChip(column: number, chipColor: string): number {
@@ -126,14 +144,14 @@ class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
         if ('RED' === this.props.playerColor) {
             chipColor = redColorCode;
         }
-        const row: number = this.dropChip(index, chipColor);
+        const row: number = this.dropChip(index, chipColor) + 1;
         const locationCode: string = this.columnLetters[index] + row;
         this.props.onChipDrop(locationCode);
     }
 
     processExternalMove(locationCode: string) {
         const column: number = this.columnLetters.indexOf(locationCode.substring(0, 1));
-        const row: number = parseInt(locationCode.substring(1));
+        const row: number = parseInt(locationCode.substring(1)) - 1;
         console.log("user move location code " + locationCode + " is column " + column + " and row " + row);
         // TODO validate row??
         var opponentColor = redColorCode;
@@ -176,8 +194,6 @@ class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
 
     renderColumns() {
         const { classes } = this.props;
-        console.log("render columns")
-        console.log(this.state.tiles)
         return this.state.tiles.map((column, i) => {
             return (
                 <Grid container className={classes.columnGrid}>
@@ -187,8 +203,6 @@ class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
             );
     });
 }
-
-
 
 render() {
     const { classes } = this.props;
