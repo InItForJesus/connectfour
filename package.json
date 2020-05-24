@@ -14,6 +14,7 @@
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "@types/uuid": "^8.0.0",
+    "@types/react-router-dom": "^5.1.5",
     "konva": "^6.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -45,6 +46,5 @@
     ]
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.1.5"
   }
 }
