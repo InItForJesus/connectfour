@@ -49,7 +49,7 @@ type GameBoardProps = {
     playerColor: string // restrict to RED or YELLOW
     enabled: boolean;
     extrnalMove: string;
-   // reset: boolean;
+    reset: boolean;
     onChipDrop: ((locationCode: string) => void);
     classes: {
         boardGrid: string;
@@ -88,9 +88,9 @@ class GameBoard extends React.Component<GameBoardProps, GameBoardState> {
         if (prevProps.extrnalMove !== this.props.extrnalMove && '' !== this.props.extrnalMove) {
             this.processExternalMove(this.props.extrnalMove);
         }
-        // if (!prevProps.reset && this.props.reset) {
-        //     this.resetGameBoard();
-        // }
+        if (!prevProps.reset && this.props.reset) {
+            this.resetGameBoard();
+        }
     }
 
     initGameBoard() {

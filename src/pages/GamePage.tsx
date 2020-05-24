@@ -51,6 +51,7 @@ type GamePageState = {
     statusText: string;
     gameBoardEnabled: boolean;
     playAgainisVisible: boolean;
+    resetGameBoard: boolean;
 }
 
 class GamePage extends React.Component<GamePageProps, GamePageState> {
@@ -78,6 +79,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
             statusText: GamePage.STATUS_CONNECTING,
             gameBoardEnabled: false,
             playAgainisVisible: false,
+            resetGameBoard: false,
         };
         this.stompClient = new Client();
         this.activateNewConnection = this.activateNewConnection.bind(this);
@@ -172,7 +174,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
 
                 this.setState({
                     userColor: gameStartReponse.playerColor, userColorCode: userColorCode,
-                    statusText: statusText, gameId: gameStartReponse.gameId
+                    statusText: statusText, gameId: gameStartReponse.gameId, resetGameBoard: false
                 });
             } else {
                 console.error('gameStartReponse failed validation') // TODO build better error message
@@ -269,7 +271,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
     }
 
     playAgainOnClick() {
-        this.setState({ playAgainisVisible: false });
+        this.setState({ playAgainisVisible: false, resetGameBoard: true});
         this.startNewGame();
     }
 
@@ -307,13 +309,13 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
                         <Typography variant='body1' className={classes.pageText}><br /><br /></Typography>
                     </Grid>
                     <Grid >
-                        <GameBoard enabled={this.state.gameBoardEnabled} playerColor={this.state.userColor} onChipDrop={this.onChipDrop} extrnalMove={this.state.externalMoveLocation} />
+                        <GameBoard enabled={this.state.gameBoardEnabled} playerColor={this.state.userColor} reset={this.state.resetGameBoard}
+                        onChipDrop={this.onChipDrop} extrnalMove={this.state.externalMoveLocation} />
                     </Grid>
                 </Grid>
             </Container>
         );
     }
-
 }
 
 export default withStyles(Styles)(GamePage);
