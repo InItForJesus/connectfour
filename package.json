@@ -13,8 +13,8 @@
     "@types/node": "^12.12.39",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
-    "@types/uuid": "^8.0.0",
     "@types/react-router-dom": "^5.1.5",
+    "@types/uuid": "^8.0.0",
     "konva": "^6.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -45,6 +45,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
