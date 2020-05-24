@@ -26,8 +26,8 @@
     "uid": "^1.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "Herokustart": "serve -s build",
+    "localstart": "react-scripts start",
+    "start": "serve -s build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
