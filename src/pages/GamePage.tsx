@@ -98,6 +98,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
         this.displayPlayAgain = this.displayPlayAgain.bind(this);
         this.playAgainOnClick = this.playAgainOnClick.bind(this);
         this.renderAppBar = this.renderAppBar.bind(this);
+        console.log("GamePage Constructor executed, userId: " + this.state.userId);
     }
 
     componentDidMount() {
@@ -129,6 +130,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
 
     onConnect(frame: Frame) {
         console.log('onConnect frame: '+frame)
+        console.log('url: '+ this.stompClient.webSocket.url);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/start', this.onGameStart);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/move', this.onGameMove);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/alert', this.onGameAlert);
