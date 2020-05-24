@@ -128,14 +128,16 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
     }
 
     onConnect(frame: Frame) {
-        this.setState({ isConnected: true, statusText: GamePage.STATUS_CONNECTED }); //TODO why does it go to this state when I turn back on the server and not get disconnect???
+        console.log('onConnect frame: '+frame)
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/start', this.onGameStart);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/move', this.onGameMove);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/alert', this.onGameAlert);
-        console.debug("subscribed to start, move, and alert queues")
+        console.debug("subscribed to start, move, and alert queues with userId " + this.state.userId)
+        this.setState({ isConnected: true, statusText: GamePage.STATUS_CONNECTED }); //TODO why does it go to this state when I turn back on the server and not get disconnect???
     }
 
     onDisconnect(frame: Frame) {
+        console.log('onDisconnect frame: '+frame)
         //TODO figure out better response
         console.error('Broker Diconnected: ' + frame.headers['message']);
         console.error('Additional details: ' + frame.body);
@@ -144,6 +146,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
     }
 
     onStompError(frame: Frame) {
+        console.log('onError frame: '+frame)
         console.error('Broker reported error: ' + frame.headers['message']);
         console.error('Additional details: ' + frame.body);
         this.setState({ isConnected: false });
