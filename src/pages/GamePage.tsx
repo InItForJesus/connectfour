@@ -7,6 +7,10 @@ import { v4 as Uuidv4 } from 'uuid'
 import GameBoard, { gameBoardColor, redColorCode, yellowColorCode } from '../component/GameBoard';
 import { stringify } from 'querystring';
 
+// *** This is configuration changes whether local or on Heorku
+//const BROKER_URL:string = 'ws://localhost:8401/connect-four-ws/websocket';
+const BROKER_URL:string = 'wss://fotf-connect-four-api.herokuapp.com/connect-four-ws/websocket';
+
 const Styles = (theme: Theme) =>
     createStyles({
         statusTitle: {
@@ -102,7 +106,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
 
     activateNewConnection() {
         this.setState({ playAgainisVisible: false });
-        this.stompClient.brokerURL = 'ws://localhost:8401/connect-four-ws/websocket'; //make configurable
+        this.stompClient.brokerURL = BROKER_URL; //make configurable
         this.stompClient.onConnect = this.onConnect;
         this.stompClient.onDisconnect = this.onDisconnect;
         this.stompClient.onStompError = this.onStompError;
