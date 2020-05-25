@@ -15,9 +15,6 @@ const Styles = (theme: Theme) =>
         statusTitle: {
             flexGrow: 1,
         },
-        pageText: {
-            alignSelf: 'center',
-        },
         exitButton: {
             marginleft: theme.spacing(2),
             marginRight: theme.spacing(2),
@@ -38,7 +35,6 @@ Game Page Props - there are no external props or hooks needed
 type GamePageProps = {
     classes: {
         statusTitle: string;
-        pageText: string;
         exitButton: string;
         playAgainButton: string;
         headerTitle: string;
@@ -57,9 +53,10 @@ Game Page State
     gameBoardEnabled - hook to enable/disable interaction on the game board
     playAgainisVisible - flag to toggle the visibilty of the 'play again' button
     resetGameBoard - hook to tell the game board to reset to starting state
+    keepAlive - timer ID useed for canceling timer
 */
 type GamePageState = {
-    isConnected: boolean; // TODO maybe need to seomthing more with this?
+    isConnected: boolean; 
     userId: string;
     gameId: number;
     userColor: string;
@@ -81,7 +78,6 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
     private static STATUS_WAITING_TO_START = "Waiting for opponent to join";
     private static STATUS_WAITING_FOR_OPPONENT = "Waiting for opponent to move";
     private static STATUS_YOUR_TURN = "Your Turn";
-    private static STATUS_PROCESSING = "Processing ...";
     private static STATUS_GAME_OVER = "Game over";
     private static STATUS_ERROR = "Something went wrong. Exit and try again.";
 
@@ -124,7 +120,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
         this.stompClient.onDisconnect = this.onDisconnect;
         this.stompClient.onStompError = this.onStompError;
         this.stompClient.activate();
-    } // TODO - disconnect on exit
+    }
 
     // wait for isConnected state to change to start the game
     componentDidUpdate(prevProps: GamePageProps, prevState: GamePageState) {
@@ -145,14 +141,13 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
     // Stomp client onConnect handler - set up the queue listners/subscriptions
     onConnect(frame: Frame) { 
         const keepAlive: number = window.setInterval(this.keepAlive, 20000) // 20 seconds Heroku recommeds 30 sec 
-        console.log('onConnect frame: ' + frame)
-        console.log('url: ' + this.stompClient.webSocket.url);
+        console.debug('onConnect frame: ' + frame)
+        console.debug('url: ' + this.stompClient.webSocket.url);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/start', this.onGameStart);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/move', this.onGameMove);
         this.stompClient.subscribe('/user/' + this.state.userId + '/queue/alert', this.onGameAlert);
         console.debug("subscribed to start, move, and alert queues with userId " + this.state.userId);
         this.setState({ isConnected: true, statusText: GamePage.STATUS_CONNECTED, keepAlive: keepAlive });
-        //TODO why does it go to STATUS_CONNECTED state when I turn back on the server and not get disconnect??? May need ack/nack 
     }
 
     //This was added to keep Heroku from killing the connection
@@ -162,17 +157,15 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
 
     // Stomp client onDisconnect handler
     onDisconnect(frame: Frame) {
-        console.log('onDisconnect frame: ' + frame)
-        //TODO figure out better response
-        console.error('Broker Diconnected: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
+        console.debug('onDisconnect frame: ' + frame)
+        console.error('Broker Diconnected: Ending Game');
         this.setState({ isConnected: false });
         this.reportError();
     }
 
     // Stomp client onStompError handler
     onStompError(frame: Frame) {
-        console.log('onError frame: ' + frame)
+        console.debug('onError frame: ' + frame)
         console.error('Broker reported error: ' + frame.headers['message']);
         console.error('Additional details: ' + frame.body);
         this.setState({ isConnected: false });
@@ -201,7 +194,7 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
                 }
                 var statusText: string = GamePage.STATUS_WAITING_FOR_OPPONENT;
                 var gameBoardEnabled: boolean = false;
-                if (gameStartReponse.waiting) {
+                if (gameStartReponse.waiting) { 
                     statusText = GamePage.STATUS_WAITING_TO_START;
                 } else if (gameStartReponse.goesFirst === gameStartReponse.playerColor) {
                     statusText = GamePage.STATUS_YOUR_TURN;
@@ -212,7 +205,8 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
                     statusText: statusText, gameId: gameStartReponse.gameId, resetGameBoard: false
                 });
             } else {
-                console.error('gameStartReponse failed validation'); // TODO build better error message
+                console.error('gameStartReponse failed validation'); 
+                console.debug('DTO userId: ' + gameStartReponse.userId + ', state userId: ' + this.state.userId);
                 this.reportError();
             }
         } else {
@@ -229,7 +223,9 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
             if (moveResponseDto.gameId === this.state.gameId && moveResponseDto.userId === this.state.userId) {
                 this.setState({ statusText: GamePage.STATUS_YOUR_TURN, externalMoveLocation: moveResponseDto.chipLocation, gameBoardEnabled: true });
             } else {
-                console.error('moveReponse failed validation'); // TODO build better error message
+                console.error('moveReponse failed validation');
+                console.debug('DTO gameId: ' + moveResponseDto.gameId + ', state gameId: ' + this.state.gameId);
+                console.debug('DTO userId: ' + moveResponseDto.userId + ', state userId: ' + this.state.userId);
                 this.reportError();
             }
         } else {
@@ -270,8 +266,11 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
                         this.setState({ statusText: GamePage.STATUS_GAME_OVER + cause, gameBoardEnabled: false, playAgainisVisible: true });
                         break;
                     case 'ERROR':
+                        console.error('Server Error ' + userNotificationDto.message)
+                        this.reportError();
+                        break;
                     default:
-                        console.error('userNotification unknown type') // TODO build better error message
+                        console.error('userNotification unknown type ' + userNotificationDto.type)
                         this.reportError();
                 }
             } else {
@@ -335,17 +334,12 @@ class GamePage extends React.Component<GamePageProps, GamePageState> {
     }
 
     render() {
-        const { classes } = this.props;
         return (
             <Container component='div'>
                 {this.renderAppBar()}
                 <Grid container justify='center'>
-                    <Grid item>
-                        {/* <Typography variant='h1' className={classes.pageTitle}>New Connect Four Game</Typography> */}
-                    </Grid>
                     <Grid container justify='center'>
-                        {/* TODO:Create place holder/spacer */}
-                        <Typography variant='body1' className={classes.pageText}><br /><br /></Typography>
+                        <Typography variant='body1'><br /></Typography>
                     </Grid>
                     <Grid >
                         <GameBoard enabled={this.state.gameBoardEnabled} playerColor={this.state.userColor} reset={this.state.resetGameBoard}
