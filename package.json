@@ -26,11 +26,10 @@
     "uid": "^1.0.0"
   },
   "scripts": {
-    "localstart": "react-scripts start",
+    "Localstart": "react-scripts start",
     "start": "serve -s build",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "react-scripts test"
   },
   "eslintConfig": {
     "extends": "react-app"

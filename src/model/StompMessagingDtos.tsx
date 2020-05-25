@@ -6,7 +6,7 @@ export class StartGameRequestDto {
 export class StartGameResponeDto {
     userId: string = '';
     gameId: number = 0;
-    playerColor: string = ''; // TODO consider enumg
+    playerColor: string = ''; 
     goesFirst: string = '';
     waiting: boolean = false;    
 }
@@ -29,5 +29,4 @@ export class UserNotificationDto {
     gameId: number = 0;
     type: string = '';
     message: string = '';
-    isTerminal: boolean = false;
 }

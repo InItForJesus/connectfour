@@ -7,9 +7,8 @@ export default function App() {
   return (
     <div>
       <Switch>
-      <Route path="/game" component={GamePage}/>}
-      <Route path="/home" component={LandingPage}/>}
-        <Route path="/" component={LandingPage}/>
+        <Route path="/game" component={GamePage} />}
+        <Route path="/" component={LandingPage} />
       </Switch>
     </div>
   );

@@ -1,11 +1,10 @@
 import React from 'react';
-import { Container, Table, Paper, Typography, Theme, createStyles, withStyles, Grid, Button } from '@material-ui/core';
-import { useHistory, Redirect, Link } from 'react-router-dom';
-import GameBoard from '../component/GameBoard';
+import { Container, Typography, Theme, createStyles, withStyles, Grid, Button } from '@material-ui/core';
+import { Link } from 'react-router-dom';
 
 const Styles = (theme: Theme) =>
     createStyles({
-        page: { //TODO get this to center vertically
+        page: { 
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'
@@ -48,7 +47,8 @@ class LandingPage extends React.Component<LandingPageProps, {}> {
                     </Grid>
                     <Grid container justify='center'>
                         <Button variant='contained' className={classes.playButton}>
-                            <Link to='/game' style={{ textDecoration: 'none', color: 'white' }}>
+                            {/* local style needed to remove hyperlink underline and make it look like normal button */}
+                            <Link to='/game' style={{ textDecoration: 'none', color: 'white' }}> 
                                 Start Game
                             </Link>
                         </Button>
